@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LiteWebApp{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <nav class="navbar">
+                <ul class="nav-bar nav-left">
+                    <li><a href="/home" class="nav-btn">Home</a></li>
+                </ul>
+                <ul class="nav-bar nav-right">
+                    <li><a href="/cart" class="nav-btn">Cart</a></li>
+                    <li><a href="/logout" class="nav-btn">Logout</a></li>
+                    <li><a href="/login" class="nav-btn">Login</a></li>
+                    <li><a href="/register" class="nav-btn">Register</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <main>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="flashes">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 LiteWebApp</p>
+    </footer>
+</body>
+</html>
