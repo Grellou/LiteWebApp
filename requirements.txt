@@ -6,3 +6,4 @@ Fask-WTF
 Werkzeug
 Jinja2
 gunicorn
+flask-bcrypt

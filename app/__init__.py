@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
 from app.routes.nagivation_route import bp as NavigationBlueprint
 
 def create_app():
@@ -11,6 +12,7 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["DEBUG"] = True
 
+    bcrypt = Bcrypt(app)
     db = SQLAlchemy(app)
 
 
