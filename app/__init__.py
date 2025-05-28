@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from app.routes.nagivation_route import bp as NavigationBlueprint
+from app.routes.user_route import bp as UserBlueprint
 
 def create_app():
     app = Flask(__name__)
@@ -18,5 +19,6 @@ def create_app():
 
     # Register blueprints here
     app.register_blueprint(NavigationBlueprint)
+    app.register_blueprint(UserBlueprint)
 
     return app
