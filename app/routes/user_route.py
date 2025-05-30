@@ -1,7 +1,8 @@
 from flask import Blueprint, flash, redirect, url_for, render_template
 from app import db
-from app.forms import RegistrationForm
+from app.forms import RegistrationForm, LoginForm
 from app.models import UserModel
+from flask_login import login_user
 
 bp = Blueprint("user", __name__)
 
@@ -29,3 +30,21 @@ def register_page():
         return redirect(url_for("navigation.home_page"))
 
     return render_template("register.html", form=form)
+
+# User login route
+@bp.route("/login", methods=["POST", "GET"])
+def login_page():
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = UserModel.query.filter_by(username=form.username.data).first()
+
+        # Check if user found and password matches
+        if user and user.check_password(form.password.data):
+            login_user(user)
+            flash("Login successful!", "success")
+            return redirect(url_for("navigation.home_page"))
+        else:
+            flash("Incorrect username or password.", "danger")
+            return redirect(url_for("user.login_page"))
+
+    return render_template("login.html", form=form)

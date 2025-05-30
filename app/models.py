@@ -1,4 +1,5 @@
 from app import db, bcrypt
+from flask_login import LoginManager, UserMixin
 
 class ItemModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
