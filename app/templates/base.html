@@ -23,23 +23,25 @@
             </nav>
         </div>
     </header>
-    
-    <main>
+    <div class="container mt-2">
         {% with messages = get_flashed_messages() %}
             {% if messages %}
-                <ul class="flashes">
+              <div class="alert alert-info alert-dismissable fade show d-flex align-items-center py-2" role="alert" style="font-size: 1rem;">
                 {% for message in messages %}
-                    <li>{{ message }}</li>
+                    {{ message }}<br>
                 {% endfor %}
-                </ul>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
             {% endif %}
         {% endwith %}
-        
+      </div>
+    <main>
         {% block content %}{% endblock %}
     </main>
     
     <footer>
         <p>&copy; 2025 LiteWebApp</p>
     </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
