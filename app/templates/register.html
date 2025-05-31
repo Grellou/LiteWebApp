@@ -5,19 +5,28 @@
 <div class="container mt-4" style="max-width: 400px;">
     <h2 class="mb-4">Register</h2>
     <form method="POST" novalidate>
-        {{ form.hidden_tag }}
+        {{ form.hidden_tag() }}
 
         {{ form.username.label }} {{ form.username(class="form-control") }}
         {% for error in form.username.error %}
             <div class="text-danger">{{ error }}</div>
         {% endfor %}
 
-        {{ form.password.label }} {{ form.password(class="form-control") }}
-        {% for error in form.password.error %}
+        {{ form.email_address.label }} {{ form.email_address(class="form-control") }}
+        {% for error in form.email_address.error %}
             <div class="text-danger">{{ error }}</div>
         {% endfor %}
 
+        {{ form.password1.label }} {{ form.password1(class="form-control") }}
+        {% for error in form.password1.error %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+
+        {{ form.password2.label }} {{ form.password2(class="form-control") }}
+        {% for error in form.password2.error %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
         <button type="submit" class="btn btn-primary mt-4">Sign up</button>
     </form>
 </div>
-{% endblock %t }
+{% endblock %}

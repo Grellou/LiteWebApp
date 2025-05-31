@@ -1,12 +1,12 @@
 from app import db, bcrypt
-from flask_login import LoginManager, UserMixin
+from flask_login import UserMixin
 
 class ItemModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String, nullable=False)
     language = db.Column(db.String, nullable=False)
 
-class UserModel(db.Model):
+class UserModel(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
     email_address = db.Column(db.String(40), nullable=False, unique=True)
