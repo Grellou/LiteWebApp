@@ -8,22 +8,22 @@
         {{ form.hidden_tag() }}
 
         {{ form.username.label }} {{ form.username(class="form-control") }}
-        {% for error in form.username.error %}
+        {% for error in form.username.errors %}
             <div class="text-danger">{{ error }}</div>
         {% endfor %}
 
         {{ form.email_address.label }} {{ form.email_address(class="form-control") }}
-        {% for error in form.email_address.error %}
+        {% for error in form.email_address.errors %}
             <div class="text-danger">{{ error }}</div>
         {% endfor %}
 
         {{ form.password1.label }} {{ form.password1(class="form-control") }}
-        {% for error in form.password1.error %}
+        {% for error in form.password1.errors %}
             <div class="text-danger">{{ error }}</div>
         {% endfor %}
 
         {{ form.password2.label }} {{ form.password2(class="form-control") }}
-        {% for error in form.password2.error %}
+        {% for error in form.password2.errors %}
             <div class="text-danger">{{ error }}</div>
         {% endfor %}
         <button type="submit" class="btn btn-primary mt-4">Sign up</button>
