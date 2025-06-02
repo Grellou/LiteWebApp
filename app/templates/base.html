@@ -15,14 +15,19 @@
                     <li><a href="/home" class="nav-btn">Home</a></li>
                 </ul>
                 <ul class="nav-bar nav-right">
-                    <li><a href="/cart" class="nav-btn">Cart</a></li>
-                    <li><a href="/logout" class="nav-btn">Logout</a></li>
-                    <li><a href="/login" class="nav-btn">Login</a></li>
-                    <li><a href="/register" class="nav-btn">Register</a></li>
+                    {% if current_user.is_authenticated %}
+                      <li><span class="nav-btn">Hello {{ current_user.username }}!</span></li>
+                      <li><a href="/cart" class="nav-btn">Cart</a></li>
+                      <li><a href="/logout" class="nav-btn">Logout</a></li>
+                    {% else %}
+                      <li><a href="/login" class="nav-btn">Login</a></li>
+                      <li><a href="/register" class="nav-btn">Register</a></li>
+                    {% endif %}
                 </ul>
             </nav>
         </div>
     </header>
+    <! -- Display flash messages -- >
     <div class="container mt-2">
         {% with messages = get_flashed_messages() %}
             {% if messages %}

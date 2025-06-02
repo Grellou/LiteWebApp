@@ -2,7 +2,7 @@ from flask import Blueprint, flash, redirect, url_for, render_template
 from app import db
 from app.forms import RegistrationForm, LoginForm
 from app.models import UserModel
-from flask_login import login_user
+from flask_login import login_user, login_required, logout_user
 
 bp = Blueprint("user", __name__)
 
@@ -48,3 +48,11 @@ def login_page():
             return redirect(url_for("user.login_page"))
 
     return render_template("login.html", form=form)
+
+# User logout route
+@bp.route("/logout")
+@login_required
+def logout_page():
+    logout_user()
+    flash("You've logged out.", "success")
+    return redirect(url_for("navigation.home_page"))
