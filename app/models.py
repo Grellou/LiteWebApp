@@ -11,6 +11,7 @@ class UserModel(db.Model, UserMixin):
     username = db.Column(db.String(20), nullable=False, unique=True)
     email_address = db.Column(db.String(40), nullable=False, unique=True)
     password_hash = db.Column(db.String(40), nullable=False)
+    verified = db.Column(db.Boolean, nullable=False, default=False)
 
     # Hash password
     def set_password(self, password):

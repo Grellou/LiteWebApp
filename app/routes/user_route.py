@@ -2,6 +2,7 @@ from flask import Blueprint, flash, redirect, url_for, render_template
 from app import db
 from app.forms import RegistrationForm, LoginForm
 from app.models import UserModel
+from app.utility import generate_token, send_verification_email
 from flask_login import login_user, login_required, logout_user
 
 bp = Blueprint("user", __name__)
@@ -13,12 +14,12 @@ def register_page():
     if form.validate_on_submit():
         
         # Check if username or email already exists
-        existing_username = UserModel.query.filter_by(username=form.username.data).first()
-        existing_email_address = UserModel.query.filter_by(email_address=form.email_address.data).first()
-        if existing_username:
+        username = UserModel.query.filter_by(username=form.username.data).first()
+        email_address = UserModel.query.filter_by(email_address=form.email_address.data).first()
+        if username:
             flash("Username is already taken.", "danger")
             return redirect(url_for("user.register_page"))
-        if existing_email_address:
+        if email_address:
             flash("Email address is already taken.", "danger")
 
         # Proceed with creating account
@@ -26,8 +27,15 @@ def register_page():
         user.set_password(form.password1.data)
         db.session.add(user)
         db.session.commit()
-        flash("Registration successful! You can login.", "success")
-        return redirect(url_for("navigation.home_page"))
+
+        # Generate and send verification email
+        verify_url = generate_token(email_address)
+        success, error = send_verification_email(user.email_address, verify_url)
+        if not success:
+            flash(f"Verification email failed to send: {error}", "danger")
+        else:
+            flash("Please check your email for verification link.", "warning")
+        return redirect(url_for("user.register_page"))
 
     return render_template("register.html", form=form)
 

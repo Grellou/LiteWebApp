@@ -7,3 +7,4 @@ Jinja2
 gunicorn
 flask-bcrypt
 email_validator
+Flask-Mail
