@@ -23,7 +23,7 @@ def register_page():
             flash("Email address is already taken.", "danger")
 
         # Proceed with creating account
-        user = UserModel(username = form.username.data, email_address = form.email_address.data)
+        user = UserModel(username = form.username.data, email_address = form.email_address.data) # type: ignore
         user.set_password(form.password1.data)
         db.session.add(user)
         db.session.commit()

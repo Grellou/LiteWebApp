@@ -8,3 +8,6 @@ gunicorn
 flask-bcrypt
 email_validator
 Flask-Mail
+flask-jwt-extended
+flask-smorest
+marshmallow
