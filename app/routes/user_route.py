@@ -1,8 +1,8 @@
 from flask import Blueprint, flash, redirect, url_for, render_template
 from app import db
-from app.forms import RegistrationForm, LoginForm
+from app.forms import RegistrationForm, LoginForm, PasswordResetForm
 from app.models import UserModel
-from app.utility import generate_token, send_verification_email, confirm_token
+from app.utility import generate_token, send_verification_email, confirm_token, generate_password_token, send_password_reset_email, confirm_password_token
 from flask_login import login_user, login_required, logout_user
 
 bp = Blueprint("user", __name__)
@@ -96,5 +96,27 @@ def verify_account_page(token):
     
     return redirect(url_for("user.login_page"))
     
+# Password reset route
+@bp.route("/password_reset")
+@login_required
+def password_reset_page():
+    form = PasswordResetForm()
+    if form.validate_on_submit():
+        # Get user by it's email address
+        user = UserModel.query.filter_by(email_address=form.email_address.data).first()
 
+    if not user:
+        flash("User with such email address was not found.", "danger")
+        return redirect(url_for("password_reset_page"))
+    
+    # Generate password reset URL and send email
+    token = generate_password_token(user.email_address)
+    verify_url = url_for("user.change_password_page", token=token, _external=True)
+    success, error = send_password_reset_email(user.email_address, verify_url)
+    if not success:
+        flash(f"Password reset email failed to send: {error}", "danger")
+    else:
+        flash("Please check your email for password reset link.", "warning")
+    return redirect(url_for("user.password_reset_page"))
 
+# Change password route

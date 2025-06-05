@@ -3,7 +3,6 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length, EqualTo, Email, ValidationError
 import re
 
-
 # Form for registration
 class RegistrationForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired(), Length(max=20)])
@@ -29,3 +28,8 @@ class LoginForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired(), Length(max=20)])
     password = PasswordField("Password", validators=[DataRequired(), Length(max=40)])
     submit = SubmitField("Login")
+
+# Form for password reset
+class PasswordResetForm(FlaskForm):
+    email_address = StringField("Email address", validators=[DataRequired(), Email(), Length(max=40)])
+    submit = SubmitField("Send password reset email")
