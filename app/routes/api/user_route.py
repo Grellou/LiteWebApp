@@ -1,13 +1,16 @@
 from flask.views import MethodView
-from flask_smorest import Blueprint, abort
+from flask_smorest import Blueprint
 from app import db
 from app.models import UserModel
-from app.schemas import UserSchema
 
 bp = Blueprint("user_api", __name__)
 
 @bp.route("/api/user/<int:user_id>")
-class User(MethodView):
+class UserId(MethodView):
+    # Get user data
+    def get(self, user_id):
+        user = UserModel.query.get_or_404(user_id)
+        return user
 
     # Delete user from database
     def delete(self, user_id):

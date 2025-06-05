@@ -2,7 +2,7 @@ from flask import Blueprint, flash, redirect, url_for, render_template
 from app import db
 from app.forms import RegistrationForm, LoginForm
 from app.models import UserModel
-from app.utility import generate_token, send_verification_email
+from app.utility import generate_token, send_verification_email, confirm_token
 from flask_login import login_user, login_required, logout_user
 
 bp = Blueprint("user", __name__)
@@ -29,13 +29,14 @@ def register_page():
         db.session.commit()
 
         # Generate and send verification email
-        verify_url = generate_token(email_address)
+        token = generate_token(user.email_address)
+        verify_url = url_for("user.verify_account_page", token=token, _external=True)
         success, error = send_verification_email(user.email_address, verify_url)
         if not success:
             flash(f"Verification email failed to send: {error}", "danger")
         else:
             flash("Please check your email for verification link.", "warning")
-        return redirect(url_for("user.register_page"))
+        return redirect(url_for("user.login_page"))
 
     return render_template("register.html", form=form)
 
@@ -48,6 +49,9 @@ def login_page():
 
         # Check if user found and password matches
         if user and user.check_password(form.password.data):
+            if not user.verified: # Check if account is verified
+                flash("Please verify your account before logging in.", "warning")
+                return redirect(url_for("user.login_page"))
             login_user(user)
             flash("Login successful!", "success")
             return redirect(url_for("navigation.home_page"))
@@ -64,3 +68,33 @@ def logout_page():
     logout_user()
     flash("You've logged out.", "success")
     return redirect(url_for("navigation.home_page"))
+
+# Account verification route
+@bp.route("/verify/<string:token>")
+def verify_account_page(token):
+    email = confirm_token(token)
+    
+    # Invalid token
+    if not email:
+        flash("Expired or invalid verification token.", "danger")
+        return redirect(url_for("user.login_page"))
+    
+    user = UserModel.query.filter_by(email_address=email).first()
+    
+    # User not found
+    if not user:
+        flash("User not found.", "danger")
+        return redirect(url_for("user.login_page"))
+    
+    # Return  according to current verification of user account
+    if user.verified:
+        flash("User is already verified.", "info")
+    else:
+        user.verified = True
+        db.session.commit()
+        flash("Your account has been verified! You can login.", "success")
+    
+    return redirect(url_for("user.login_page"))
+    
+
+

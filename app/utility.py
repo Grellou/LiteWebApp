@@ -12,9 +12,10 @@ def generate_token(user_email_address):
     return token.dumps(user_email_address, salt="email-confirmation")
 
 # Confirm token and extract email address if valid
-def confirm_token(token, expiration=TOKEN_EXPIRATION):
+def confirm_token(token_str, expiration=TOKEN_EXPIRATION):
     try:
-        return token.loads(token, max_age=expiration)
+        email = token.loads(token_str, salt="email-confirmation", max_age=expiration)
+        return email
     except SignatureExpired:
         return None, "Confirmation link has expired."
     except BadSignature:
