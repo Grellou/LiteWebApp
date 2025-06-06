@@ -33,3 +33,9 @@ class LoginForm(FlaskForm):
 class PasswordResetForm(FlaskForm):
     email_address = StringField("Email address", validators=[DataRequired(), Email(), Length(max=40)])
     submit = SubmitField("Send password reset email")
+
+# Form to change password after reset request
+class PasswordChangeForm(FlaskForm):
+    password1 = PasswordField("New password", validators=[DataRequired(), Length(min=8, max=40)])
+    password2 = PasswordField("Confirm password", validators=[DataRequired(), EqualTo("password1")])
+    submit = SubmitField("Confirm")

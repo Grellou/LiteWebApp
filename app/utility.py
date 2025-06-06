@@ -8,13 +8,10 @@ token = URLSafeTimedSerializer(SECRET_KEY)
 TOKEN_EXPIRATION = 900 # seconds. 15 mins
 PASSWORD_TOKEN_EXPIRATION = 1800 # seconds. 30 mins
 
+# ----- ACCOUNT VERIFICATION UTILS -----
 # Generate time limited token for user email address confirmation
 def generate_token(user_email_address):
     return token.dumps(user_email_address, salt="email-confirmation")
-
-# Generate time limited password reset token
-def generate_password_token(user_email_address):
-    return token.dumps(user_email_address, salt="password-reset")
 
 # Confirm token and extract email address if valid
 def confirm_token(token_str, expiration=TOKEN_EXPIRATION):
@@ -25,18 +22,6 @@ def confirm_token(token_str, expiration=TOKEN_EXPIRATION):
         return None, "Confirmation link has expired."
     except BadSignature:
         return None, "Invalid confirmation link."
-    except Exception as error:
-        return None, f"Token confirmation failed {str(error)}."
-
-# Confirm password token and extract email address if valid
-def confirm_password_token(token_str, expiration=TOKEN_EXPIRATION):
-    try:
-        email = token.loads(token_str, salt="password-reset", max_age=expiration)
-        return email
-    except SignatureExpired:
-        return None, "Password reset link has expired."
-    except BadSignature:
-        return None, "Invalid password reset link."
     except Exception as error:
         return None, f"Token confirmation failed {str(error)}."
 
@@ -52,7 +37,24 @@ def send_verification_email(user_email_address, verification_url):
     except Exception as error:
         return False, f"Email sending has failed: {str(error)}"
 
-# Send email verification with secure link
+# ----- PASSWORD RESET UTILS -----
+# Generate time limited password reset token
+def generate_password_token(user_email_address):
+    return token.dumps(user_email_address, salt="password-reset")
+
+# Confirm password token and extract email address if valid
+def confirm_password_token(token_str, expiration=TOKEN_EXPIRATION):
+    try:
+        email = token.loads(token_str, salt="password-reset", max_age=expiration)
+        return email
+    except SignatureExpired:
+        return None, "Password reset link has expired."
+    except BadSignature:
+        return None, "Invalid password reset link."
+    except Exception as error:
+        return None, f"Token confirmation failed {str(error)}."
+
+# Send password reset URL to user's email address
 def send_password_reset_email(user_email_address, verification_url):
     try:
         message = Message(
