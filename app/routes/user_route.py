@@ -23,7 +23,7 @@ def register_page():
             flash("Email address is already taken.", "danger")
 
         # Proceed with creating account
-        user = UserModel(username = form.username.data, email_address = form.email_address.data) # type: ignore
+        user = UserModel(username = form.username.data, email_address = form.email_address.data) # type: ignore 
         user.set_password(form.password1.data)
         db.session.add(user)
         db.session.commit()
@@ -141,5 +141,5 @@ def change_password_page(token):
             flash("Password has been changed successfully!", "success")
             return redirect(url_for("user.login_page"))
 
-    return render_template("password_change.html")
+    return render_template("password_change.html", form=form)
 
