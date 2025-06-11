@@ -1,4 +1,3 @@
-from os import access
 from flask_smorest import abort
 from flask.views import MethodView
 from flask_smorest import Blueprint
@@ -6,7 +5,6 @@ from app import db
 from app.models import UserModel
 from app.schemas import UserSchema, AuthSchema, AuthResponseSchema
 from sqlalchemy.exc import SQLAlchemyError
-from flask import request, jsonify
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
 bp = Blueprint("user_api", __name__)
@@ -15,6 +13,7 @@ bp = Blueprint("user_api", __name__)
 class Auth(MethodView):
     @bp.arguments(AuthSchema)
     @bp.response(200, AuthResponseSchema)
+    @bp.doc(desciption="Get access token.")
     def post(self, auth_data):
         user = UserModel.query.filter_by(username=auth_data["username"]).first()
 
@@ -27,14 +26,18 @@ class Auth(MethodView):
 @bp.route("/api/user/<int:user_id>")
 class UserId(MethodView):
     # Get single user data
+    @jwt_required()
     @bp.response(200, UserSchema)
+    @bp.doc(description="Get single user's data.")
     def get(self, user_id):
         user = UserModel.query.get_or_404(user_id)
         return user
 
     # Update single user data
+    @jwt_required()
     @bp.arguments(UserSchema)
     @bp.response(200, UserSchema)
+    @bp.doc(description="Update single user's data.")
     def put(self, user_data, user_id):
         user = UserModel.query.get_or_404(user_id)
 
@@ -53,6 +56,9 @@ class UserId(MethodView):
         return {"message": "User data updated."}, 200
 
     # Delete single user from database
+    @jwt_required()
+    @bp.response(200, description="User deleted.")
+    @bp.doc(description="Delete single user.")
     def delete(self, user_id):
         user = UserModel.query.get_or_404(user_id)
         db.session.delete(user)
@@ -63,8 +69,10 @@ class UserId(MethodView):
 @bp.route("/api/user")
 class User(MethodView):
     # Add single user
+    @jwt_required()
     @bp.arguments(UserSchema)
     @bp.response(201, UserSchema)
+    @bp.doc(description="Add single user.")
     def post(self, user_data):
         # Check if user exists
         if UserModel.query.filter_by(email_address=user_data["email_address"]).first():
@@ -85,11 +93,16 @@ class User(MethodView):
 @bp.route("/api/users")
 class Users(MethodView):
     # Get list of all users
+    @jwt_required()
     @bp.response(200, UserSchema(many=True))
+    @bp.doc(description="Get list of all users.")
     def get(self):
         return UserModel.query.all()
 
     # Delete all users
+    @jwt_required()
+    @bp.response(200, description="All users deleted.")
+    @bp.doc(description="Delete all users.")
     def delete(self):
         users = UserModel.query.all()
         for user in users:
