@@ -15,6 +15,7 @@ login_manager = LoginManager()
 mail = Mail()
 migrate = Migrate()
 api = Api()
+jwt = JWTManager()
 
 # Load user
 @login_manager.user_loader
@@ -39,6 +40,7 @@ def create_app():
     app.config["OPENAPI_URL_PREFIX"] = "/"
     app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui"
     app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
+    app.config["JWT_SECRET_KEY"] = "dev119"
 
     # Mail configs
     app.config["MAIL_SERVER"] = "smtp.gmail.com"
@@ -59,6 +61,7 @@ def create_app():
     mail.init_app(app)
     migrate.init_app(app, db)
     api.init_app(app)
+    jwt.init_app(app)
 
     # Register blueprints
     from app.routes.nagivation_route import bp as NavigationBlueprint

@@ -1,12 +1,28 @@
+from os import access
 from flask_smorest import abort
 from flask.views import MethodView
 from flask_smorest import Blueprint
 from app import db
 from app.models import UserModel
-from app.schemas import UserSchema
+from app.schemas import UserSchema, AuthSchema, AuthResponseSchema
 from sqlalchemy.exc import SQLAlchemyError
+from flask import request, jsonify
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
 bp = Blueprint("user_api", __name__)
+
+@bp.route("/api/auth")
+class Auth(MethodView):
+    @bp.arguments(AuthSchema)
+    @bp.response(200, AuthResponseSchema)
+    def post(self, auth_data):
+        user = UserModel.query.filter_by(username=auth_data["username"]).first()
+
+        if not user or not user.check_password(auth_data["password"]):
+            abort(401, message="Invalid credentials.")
+
+        access_token = create_access_token(identity=user.id)
+        return {"access_token": access_token}
 
 @bp.route("/api/user/<int:user_id>")
 class UserId(MethodView):

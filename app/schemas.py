@@ -6,3 +6,10 @@ class UserSchema(Schema):
     email_address = fields.Str(required=True)
     password = fields.Str(required=True, load_only=True)
     verified = fields.Bool(required=True)
+
+class AuthSchema(Schema):
+    username = fields.Str(required=True)
+    password = fields.Str(required=True, load_only=True)
+
+class AuthResponseSchema(Schema):
+    access_token = fields.Str()
