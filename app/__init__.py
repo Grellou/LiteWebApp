@@ -41,6 +41,7 @@ def create_app():
     app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui"
     app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
     app.config["JWT_SECRET_KEY"] = "dev119"
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 900 # 15mins
 
     # Mail configs
     app.config["MAIL_SERVER"] = "smtp.gmail.com"

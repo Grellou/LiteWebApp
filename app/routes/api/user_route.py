@@ -5,20 +5,24 @@ from app import db
 from app.models import UserModel
 from app.schemas import UserSchema, AuthSchema, AuthResponseSchema
 from sqlalchemy.exc import SQLAlchemyError
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+from flask_jwt_extended import create_access_token, jwt_required
 
 bp = Blueprint("user_api", __name__)
 
 @bp.route("/api/auth")
 class Auth(MethodView):
+    # Authorize to get access token
     @bp.arguments(AuthSchema)
     @bp.response(200, AuthResponseSchema)
     @bp.doc(desciption="Get access token.")
     def post(self, auth_data):
         user = UserModel.query.filter_by(username=auth_data["username"]).first()
-
+        
+        # Verify credentials and if user is admin
         if not user or not user.check_password(auth_data["password"]):
             abort(401, message="Invalid credentials.")
+        if not user.username == "admin":
+            abort(403, message="User is does not have sufficient permissions.")
 
         access_token = create_access_token(identity=user.id)
         return {"access_token": access_token}
