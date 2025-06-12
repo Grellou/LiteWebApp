@@ -47,17 +47,41 @@ def login_page():
     if form.validate_on_submit():
         user = UserModel.query.filter_by(username=form.username.data).first()
 
-        # Check if user found and password matches
-        if user and user.check_password(form.password.data):
-            if not user.verified: # Check if account is verified
-                flash("Please verify your account before logging in.", "warning")
-                return redirect(url_for("user.login_page"))
-            login_user(user)
-            flash("Login successful!", "success")
-            return redirect(url_for("navigation.home_page"))
-        else:
+        # Validate if user exists in db
+        if not user:
+            flash("Account with such username not found.", "danger")
+            return redirect(url_for("user.login_page"))
+        
+        # Check if password is correct
+        if not user.check_password(form.password.data):
+            user.login_attempts += 1 # increase login attempts value
+            db.session.commit()
             flash("Incorrect username or password.", "danger")
             return redirect(url_for("user.login_page"))
+
+        # Check if login attempts should lock user account
+        if user.login_attempts >= 3:
+            user.locked = True # Lock account
+            db.session.commit()
+            flash("Your account has been locked due to too many invalid login attemps.", "danger")
+
+        # Check if account is verified
+        if not user.verified:
+            flash("Your account is not verified. Please check your email.", "danger")
+            return redirect(url_for("user.login_page"))
+
+        # Check if account is not locked
+        if user.locked:
+            flash("Your account has been locked.", "danger")
+            return redirect(url_for("user.login_page"))
+
+        
+        # Login user if all validations passed
+        login_user(user)
+        user.login_attempts = 0 # reset login attempts
+        db.session.commit()
+        flash("Login successful!", "success")
+        return redirect(url_for("navigation.home_page"))
 
     return render_template("login.html", form=form)
 
@@ -137,6 +161,8 @@ def change_password_page(token):
         user = UserModel.query.filter_by(email_address=email).first()
         if user:
             user.set_password(form.password1.data)
+            user.login_attempts = 0
+            user.locked = False
             db.session.commit()
             flash("Password has been changed successfully!", "success")
             return redirect(url_for("user.login_page"))

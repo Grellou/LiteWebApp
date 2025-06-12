@@ -29,7 +29,7 @@ def confirm_token(token_str, expiration=TOKEN_EXPIRATION):
 def send_verification_email(user_email_address, verification_url):
     try:
         message = Message(
-            subject="LiteWebApp account verification",
+            subject="LiteWebApp - account verification",
             recipients=[user_email_address],
             body=f"Please verify your account: {verification_url}")
         mail.send(message)
@@ -58,10 +58,24 @@ def confirm_password_token(token_str, expiration=TOKEN_EXPIRATION):
 def send_password_reset_email(user_email_address, verification_url):
     try:
         message = Message(
-            subject="LiteWebApp password reset",
+            subject="LiteWebApp - password reset",
             recipients=[user_email_address],
             body=f"In order to reset your password go to the following link: {verification_url}")
         mail.send(message)
         return True, None
     except Exception as error:
         return False, f"Email sending has failed: {str(error)}"
+
+# ----- ACCOUNT LOCKED UTILS -----
+# Send email about account getting locked
+def send_account_locked_email(user_email_address):
+    try:
+        message = Message(
+            subject="LiteWebApp - your account is locked",
+            recipients=[user_email_address],
+            body="Your account has been locked. In order to restore your access - you must reset your password. Please follow instructions in our website.")
+        mail.send(message)
+        return True, None
+    except Exception as error:
+        return False, f"Email sending has failed: {str(error)}"
+
