@@ -1,9 +1,10 @@
 from flask import Blueprint, flash, redirect, url_for, render_template
 from app import db
-from app.forms import RegistrationForm, LoginForm, PasswordResetForm, PasswordChangeForm
+from app.forms import RegistrationForm, LoginForm, PasswordResetForm, PasswordChangeForm, EmailChangeForm, EmailChangeRequestForm
 from app.models import UserModel
-from app.utility import generate_token, send_verification_email, confirm_token, generate_password_token, send_password_reset_email, confirm_password_token
-from flask_login import login_user, login_required, logout_user
+from app.utility import generate_token, send_verification_email, confirm_token, generate_password_token, send_password_reset_email, confirm_password_token 
+from app.utility import send_account_locked_email, generate_email_change_token, confirm_email_change_token, send_email_change_email
+from flask_login import current_user, login_user, login_required, logout_user
 
 bp = Blueprint("user", __name__)
 
@@ -63,6 +64,7 @@ def login_page():
         if user.login_attempts >= 3:
             user.locked = True # Lock account
             db.session.commit()
+            send_account_locked_email(user.email_address)
             flash("Your account has been locked due to too many invalid login attemps.", "danger")
 
         # Check if account is verified
@@ -75,13 +77,12 @@ def login_page():
             flash("Your account has been locked.", "danger")
             return redirect(url_for("user.login_page"))
 
-        
         # Login user if all validations passed
         login_user(user)
         user.login_attempts = 0 # reset login attempts
         db.session.commit()
         flash("Login successful!", "success")
-        return redirect(url_for("navigation.home_page"))
+        return redirect(url_for("navigationa.home_page"))
 
     return render_template("login.html", form=form)
 
@@ -169,3 +170,50 @@ def change_password_page(token):
 
     return render_template("password_change.html", form=form)
 
+# My profile
+@bp.route("/profile", methods=["POST", "GET"])
+@login_required
+def profile_page():
+    form = EmailChangeRequestForm()
+    return render_template("profile.html", form=form)
+
+# Change email request route
+@bp.route("/change_email", methods=["GET", "POST"])
+@login_required
+def change_email_request_page():
+    form = EmailChangeRequestForm()
+    if form.validate_on_submit():
+        # Get user by it's email address
+        user = UserModel.query.filter_by(email_address=form.email_address.data).first()
+
+        if not user:
+            flash("User with such email address was not found.", "danger")
+            return redirect(url_for("user.profile_page"))
+        
+        # Check entered password in form
+        if current_user.check_password(form.password1.data):
+            # Generate password reset URL and send email
+            token = generate_email_change_token(user.email_address)
+            verify_url = url_for("user.change_email_page", token=token, _external=True)
+            success, error = send_email_change_email(user.email_address, verify_url)
+            if not success:
+                flash(f"Email change request failed to send: {error}", "danger")
+            else:
+                flash("Please check your email for instructions of how change your email address.", "success")
+        else:
+            flash("Invalid password", "danger")
+    return redirect(url_for("navigation.profile_page"))
+
+# Change email
+@bp.route("/change_email/<string:token>", methods=["POST", "GET"])
+@login_required
+def change_email_page(token):
+    # Verify token
+    email = confirm_password_token(token)
+    
+    # Invalid token
+    if not email:
+        flash("Expired or invalid email change request.", "danger")
+        return redirect(url_for("user.profile_page"))
+
+    return redirect(url_for("user.profile_page"))

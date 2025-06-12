@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile - LiteWebApp{% endblock %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 600px;">
+  <h2 class="mt-4">My profile</h2>
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Account information</h5>
+      <p class="card-text"><strong>Username:</strong>{{ current_user.username }}</p>
+      <p class="card-text"><strong>Email address:</strong>{{ current_user.email_address }}</p>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

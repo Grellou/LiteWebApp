@@ -79,3 +79,31 @@ def send_account_locked_email(user_email_address):
     except Exception as error:
         return False, f"Email sending has failed: {str(error)}"
 
+# ----- CHANGE EMAIL UTILS -----
+# Generate time limited email change token
+def generate_email_change_token(user_email_address):
+    return token.dumps(user_email_address, salt="email-change")
+
+# Confirm email change token and extract email address if valid
+def confirm_email_change_token(token_str, expiration=TOKEN_EXPIRATION):
+    try:
+        email = token.loads(token_str, salt="email-change", max_age=expiration)
+        return email
+    except SignatureExpired:
+        return None, "Password reset link has expired."
+    except BadSignature:
+        return None, "Invalid password reset link."
+    except Exception as error:
+        return None, f"Token confirmation failed {str(error)}."
+
+# Send email with email change instructions and URL
+def send_email_change_email(user_email_address, verification_url):
+    try:
+        message = Message(
+            subject="LiteWebApp - email change",
+            recipients=[user_email_address],
+            body=f"In order to change your email please go to the following link: {verification_url}")
+        mail.send(message)
+        return True, None
+    except Exception as error:
+        return False, f"Email sending has failed: {str(error)}"
