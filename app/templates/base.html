@@ -17,7 +17,7 @@
                 <ul class="nav-bar nav-right">
                     {% if current_user.is_authenticated %}
                       <li><span class="nav-btn">Hello {{ current_user.username }}!</span></li>
-                      <li><a href="/cart" class="nav-btn">Cart</a></li>
+                      <li><a href="/profile" class="nav-btn">Profile</a></li>
                       <li><a href="/logout" class="nav-btn">Logout</a></li>
                     {% else %}
                       <li><a href="/login" class="nav-btn">Login</a></li>

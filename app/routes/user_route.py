@@ -82,7 +82,7 @@ def login_page():
         user.login_attempts = 0 # reset login attempts
         db.session.commit()
         flash("Login successful!", "success")
-        return redirect(url_for("navigationa.home_page"))
+        return redirect(url_for("navigation.home_page"))
 
     return render_template("login.html", form=form)
 
@@ -203,7 +203,7 @@ def change_email_request_page():
                 flash("Please check your email for instructions of how change your email address.", "success")
         else:
             flash("Invalid password", "danger")
-    return redirect(url_for("navigation.profile_page"))
+    return redirect(url_for("user.profile_page"))
 
 # Change email route
 @bp.route("/change_email/<string:token>", methods=["POST", "GET"])
@@ -222,5 +222,6 @@ def change_email_page(token):
         current_user.email_address = form.email_address.data
         db.session.commit()
         flash("Your email address has been updated successfully!", "success")
+        return redirect(url_for("user.profile_page"))
 
-    return redirect(url_for("user.profile_page"))
+    return render_template("email_change.html", form=form)
