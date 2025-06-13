@@ -185,7 +185,8 @@ def change_email_request_page():
     if form.validate_on_submit():
         # Get user by it's email address
         user = UserModel.query.filter_by(email_address=form.email_address.data).first()
-
+        
+        # Invalid user
         if not user:
             flash("User with such email address was not found.", "danger")
             return redirect(url_for("user.profile_page"))
@@ -204,16 +205,22 @@ def change_email_request_page():
             flash("Invalid password", "danger")
     return redirect(url_for("navigation.profile_page"))
 
-# Change email
+# Change email route
 @bp.route("/change_email/<string:token>", methods=["POST", "GET"])
 @login_required
 def change_email_page(token):
     # Verify token
-    email = confirm_password_token(token)
+    email = confirm_email_change_token(token)
     
     # Invalid token
     if not email:
         flash("Expired or invalid email change request.", "danger")
         return redirect(url_for("user.profile_page"))
+    
+    form = EmailChangeForm()
+    if form.validate_on_submit():
+        current_user.email_address = form.email_address.data
+        db.session.commit()
+        flash("Your email address has been updated successfully!", "success")
 
     return redirect(url_for("user.profile_page"))

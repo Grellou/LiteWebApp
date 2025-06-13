@@ -54,10 +54,10 @@ class PasswordChangeForm(FlaskForm):
 
 # Form to request email change
 class EmailChangeRequestForm(FlaskForm):
-    email_address = StringField("Email address", validators=[DataRequired(), Email(), Length(max=40)])
+    email_address = StringField("Your current email address", validators=[DataRequired(), Email(), Length(max=40)])
     password1 = PasswordField("Password", validators=[DataRequired(), Length(min=8, max=40)])
     password2 = PasswordField("Confirm password", validators=[DataRequired(), EqualTo("password1")])
-    submit = SubmitField("Confirm")
+    submit = SubmitField("Submit")
 
 # Form to change email address
 class EmailChangeForm(FlaskForm):
