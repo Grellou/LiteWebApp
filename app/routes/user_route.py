@@ -1,6 +1,6 @@
 from flask import Blueprint, flash, redirect, url_for, render_template
 from app import db
-from app.forms import RegistrationForm, LoginForm, PasswordResetForm, PasswordChangeForm, EmailChangeForm, EmailChangeRequestForm
+from app.forms import RegistrationForm, LoginForm, PasswordResetForm, PasswordChangeForm, EmailChangeForm, EmailChangeRequestForm, PasswordUpdateForm
 from app.models import UserModel
 from app.utility import generate_token, send_verification_email, confirm_token, generate_password_token, send_password_reset_email, confirm_password_token 
 from app.utility import send_account_locked_email, generate_email_change_token, confirm_email_change_token, send_email_change_email
@@ -174,8 +174,38 @@ def change_password_page(token):
 @bp.route("/profile", methods=["POST", "GET"])
 @login_required
 def profile_page():
-    form = EmailChangeRequestForm()
-    return render_template("profile.html", form=form)
+    email_form = EmailChangeRequestForm()
+    password_form = PasswordUpdateForm()
+    return render_template("profile.html", email_form=email_form, password_form=password_form)
+
+# Update password in profile profile_page
+@bp.route("/update_password", methods=["POST"])
+@login_required
+def update_password_page():
+    form = PasswordUpdateForm()
+    if form.validate_on_submit():
+        # Check if valid current password
+        if not current_user.check_password(form.password_current.data):
+            flash("Password invalid", "danger")
+            return redirect(url_for("user.profile_page"))
+        
+        try:
+            # Set new password
+            current_user.set_password(form.password1.data)
+            db.session.commit()
+            flash("Password has been changed successfully", "success")
+        except Exception as error:
+            db.session.rollback()
+            flash(f"Failed to update password: {str(error)}", "danger")
+
+    else:
+        # Form validation failed
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{field}: {error}", "danger")
+    
+    return redirect(url_for("user.profile_page"))
+
 
 # Change email request route
 @bp.route("/change_email", methods=["GET", "POST"])

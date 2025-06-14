@@ -13,3 +13,11 @@ class AuthSchema(Schema):
 
 class AuthResponseSchema(Schema):
     access_token = fields.Str()
+
+class ItemSchema(Schema):
+    id = fields.Int(dump_only=True)
+    name = fields.Str(required=True)
+    type = fields.Str(required=True)
+    language = fields.Str(required=True)
+    price = fields.Float(required=True)
+    quantity = fields.Int(required=True)

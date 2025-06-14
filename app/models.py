@@ -3,8 +3,11 @@ from flask_login import UserMixin
 
 class ItemModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.String, nullable=False)
-    language = db.Column(db.String, nullable=False)
+    name = db.Column(db.String(20), nullable=False)
+    type = db.Column(db.String(20), nullable=False)
+    language = db.Column(db.String(20), nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
 
 class UserModel(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)

@@ -68,10 +68,12 @@ def create_app():
     from app.routes.nagivation_route import bp as NavigationBlueprint
     from app.routes.user_route import bp as UserBlueprint
     from app.routes.api.user_route import bp as UserApiBlueprint
+    from app.routes.api.item_route import bp as ItemApiBlueprint
+
 
     app.register_blueprint(NavigationBlueprint)
     app.register_blueprint(UserBlueprint)
-
     api.register_blueprint(UserApiBlueprint)
+    api.register_blueprint(ItemApiBlueprint)
 
     return app
