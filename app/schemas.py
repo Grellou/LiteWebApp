@@ -21,3 +21,7 @@ class ItemSchema(Schema):
     language = fields.Str(required=True)
     price = fields.Float(required=True)
     quantity = fields.Int(required=True)
+
+class ItemsSchema(Schema):
+    items = fields.List(fields.Nested(ItemSchema), required=True) # Array of items that belongs to ItemSchema
+

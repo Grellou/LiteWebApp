@@ -31,7 +31,7 @@ class Item(MethodView):
         return item
 
 @bp.route("/api/item/<int:item_id>")
-class ItemID(MethodView):
+class ItemId(MethodView):
     # Update single user's data
     @jwt_required()
     @bp.arguments(ItemSchema)
@@ -76,3 +76,47 @@ class ItemID(MethodView):
 
         return {"message": "Item deleted."}, 200
 
+@bp.route("/api/items")
+class Items(MethodView):
+    # Get list of all items
+    @jwt_required()
+    @bp.response(200, ItemSchema(many=True))
+    @bp.doc(description="Get list of all items.")
+    def get(self):
+        return ItemModel.query.all()
+    
+    # Create multiple items from single request
+    @jwt_required()
+    @bp.arguments(ItemSchema)
+    @bp.response(201, ItemSchema)
+    @bp.doc(description="Create multiple items from single request")
+    def post(self, items_data):
+        items = []
+        try:
+            for item_data in items_data["items"]:
+
+                # Check for duplicate item names
+                if ItemModel.query.filter_by(name=item_data["name"]).first():
+                    db.session.rollback()
+                    abort(400, message="Item already exists.")
+                # Add items   
+                item = ItemModel(**item_data)
+                db.session.add(item)
+                db.session.commit()
+        except SQLAlchemyError as error:
+            db.session.rollback()
+            abort(500, message=f"An error occurred while adding items: {str(error)}")
+
+        return items
+    
+    # Delete all items
+    @jwt_required()
+    @bp.response(200, description="All items deleted.")
+    @bp.doc(description="Delete all items.")
+    def delete(self):
+        items = ItemModel.query.all()
+        for item in items:
+            db.session.delete(item)
+        db.session.commit()
+        
+        return {"message": "All items deleted."}, 200
