@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Store - LiteWebApp{% endblock %}
+
+{% block content %}
+    <h3>Store</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Language</th>
+          <th>Price</th>
+          <th>Quantity</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr>
+          <td>{{ item.name }}</td>
+          <td>{{ item.type }}</td>
+          <td>{{ item.language }}</td>
+          <td>{{ item.price }}</td>
+          <td>{{ item.quantity }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+{% endblock %}

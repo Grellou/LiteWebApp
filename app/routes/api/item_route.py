@@ -1,6 +1,6 @@
 from app import db
 from app.models import ItemModel
-from app.schemas import ItemSchema
+from app.schemas import ItemSchema, ItemsSchema
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from sqlalchemy.exc import SQLAlchemyError
@@ -87,8 +87,8 @@ class Items(MethodView):
     
     # Create multiple items from single request
     @jwt_required()
-    @bp.arguments(ItemSchema)
-    @bp.response(201, ItemSchema)
+    @bp.arguments(ItemsSchema)
+    @bp.response(201, ItemsSchema)
     @bp.doc(description="Create multiple items from single request")
     def post(self, items_data):
         items = []
@@ -96,7 +96,7 @@ class Items(MethodView):
             for item_data in items_data["items"]:
 
                 # Check for duplicate item names
-                if ItemModel.query.filter_by(name=item_data["name"]).first():
+                if ItemModel.query.filter_by(name=item_data["name"], language=item_data["language"]).first():
                     db.session.rollback()
                     abort(400, message="Item already exists.")
                 # Add items   
