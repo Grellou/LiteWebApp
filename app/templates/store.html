@@ -2,28 +2,59 @@
 
 {% block title %}Store - LiteWebApp{% endblock %}
 
+
 {% block content %}
-    <h3>Store</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Language</th>
-          <th>Price</th>
-          <th>Quantity</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in items %}
-        <tr>
-          <td>{{ item.name }}</td>
-          <td>{{ item.type }}</td>
-          <td>{{ item.language }}</td>
-          <td>{{ item.price }}</td>
-          <td>{{ item.quantity }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+<form method="get" class="mb-4 d-flex justify-content-end">
+  <div class="input-group w-25">
+    <input type="text" name="query" class="form-control bg-dark text-white" placeholder="Search..." value="{{ request.args.get('query', '') }}">
+  </div>
+</form>
+
+<div class="container mt-4">
+  <div class="card shadow-sm bg-dark text-white">
+    <div clas="card-header bg-primary text-white">
+      <h3 class="mb-0">Store</h3>
+    </div>
+    <div class="card-body">
+      <table class="table table-dark table-stripped table-hover align-middle">
+        <thead>
+          <tr>
+            {% for col, label in [
+            ('name', 'Name'),
+            ('type', 'Type'),
+            ('language', 'Language'),
+            ('price', 'Price'),
+            ('quantity', 'Quantity')
+            ] %}
+              <th>
+                <a href="{{ url_for('navigation.store_page', search_query=search_query, sort=col, 
+                  direction='desc' if sort==col and direction=='asc' else 'asc') }}" class="text-white text-decoration-none">
+                  {{ label }}
+                  {% if sort == col %}
+                    {% if direction == 'asc' %}
+                      &#9650;
+                    {% else %}
+                      &#9660;
+                    {% endif %}
+                  {% endif %}
+                </a>
+              </th>
+              {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          <tr>
+            <td>{{ item.name }}</td>
+            <td>{{ item.type }}</td>
+            <td>{{ item.language }}</td>
+            <td>{{ item.price }}</td>
+            <td>{{ item.quantity }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 {% endblock %}

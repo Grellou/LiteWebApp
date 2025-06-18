@@ -92,6 +92,11 @@ h1 {
     text-decoration: none;
 }
 
+.form-control::placeholder {
+  color: #bbb;
+  opacity: 1;
+}
+
 main {
     padding: 2rem;
 }
